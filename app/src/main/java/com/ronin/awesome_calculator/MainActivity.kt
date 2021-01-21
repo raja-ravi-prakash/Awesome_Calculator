@@ -5,12 +5,18 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import net.objecthunter.exp4j.ExpressionBuilder
+import java.lang.IllegalArgumentException
 
 class MainActivity : AppCompatActivity() {
 
-    fun eval(exp:String):Double {
+    private fun eval(exp:String):String {
 
-        return ExpressionBuilder(exp).build().evaluate()
+        return try {
+            val result =  ExpressionBuilder(exp).build().evaluate()
+            result.toString()
+        }catch (e:IllegalArgumentException) {
+            "Illegal Expression"
+        }
 
     }
 
@@ -19,17 +25,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val buttons = arrayListOf<Button>()
-        var expression:String = ""
-        var solution_text = findViewById<TextView>(R.id.solution)
+        var expression = ""
+        val solutionText = findViewById<TextView>(R.id.solution)
 
-        for(i in 1..19){
+        for(i in 0..19){
             val id = "button$i"
-            val temp_button = findViewById<Button>(resources.getIdentifier(id,"id",packageName))
-            temp_button.setOnClickListener {
-                val button_text = (it as Button).text
-
-                when(button_text){
+            val tempButton = findViewById<Button>(resources.getIdentifier(id,"id",packageName))
+            tempButton.setOnClickListener {
+                (it as Button)
+                when(it.text){
                     "AC" -> {
                         expression = ""
                     }
@@ -37,16 +41,14 @@ class MainActivity : AppCompatActivity() {
                         expression = expression.substring(0,expression.length - 1)
                     }
                     "=" -> {
-                        val sol = eval(expression)
-                        solution_text.setText(sol.toString())
+                        expression = eval(expression)
                     }
                     else -> {
-                        expression += button_text
+                        expression += it.text
                     }
                 }
-
+                solutionText.text = expression
             }
-            buttons.add(temp_button)
         }
     }
 }
